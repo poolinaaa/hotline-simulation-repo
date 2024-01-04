@@ -1,6 +1,7 @@
 import random
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
+
 
 class Client:
     id = 0
@@ -18,7 +19,10 @@ class Client:
         cases = ['personal account', 'credits', 'loans', 'crisis situation']
         probabilities = [0.5, 0.3, 0.25, 0.2]
         self.case = random.choices(cases, weights=probabilities)
-        
+    
+    def generate_service_time(self):
+        pass
+    
     def generate_id(self):
         self.id = id
         Client.id += 1
@@ -40,6 +44,12 @@ class Employee:
             self.status = 'occupied'
         else:
             self.status = 'free'
+            
+#20 procent szans że klient wybrał źle kolejkę           
+    def check_if_clients_choice_of_case(self):
+        pass
+#tutaj też zaktualizuje czas pracownika          
+    
     
  
 class Queue:
@@ -101,6 +111,8 @@ class Queue:
 
 
 #zakladam 4 specjalistów konta, 3 kredyty, 2 pozyczki i 2 kryzys
+#20 procent szans że klient wybrał źle kolejkę
+
 class Simulation:
     
     def __init__(self, day : str):
@@ -111,10 +123,10 @@ class Simulation:
         
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
             self.flowOfClients = 4
-            self.startTime = "8:00:00"
+            self.start_time = datetime.now().replace(microsecond=0, second=0, minute=0, hour=8)  
         else:
             self.flowOfClients = 8
-            self.startTime = "9:00:00"
+            self.startTime = datetime.now().replace(microsecond=0, second=0, minute=0, hour=9)  
     
     def check_case_of_client(self, client : Client):
         if client.case == 'personal account':
@@ -132,11 +144,12 @@ class Simulation:
         while current < timeToSimulate:
             timeToNextClient = random.expovariate(self.flowOfClients)
             
+            #arrival of client, append to the queue
             now = self.startTime + timedelta(minutes=current)
             client = Client(now)
             self.check_case_of_client(client)
             
-            
-            
+            for queue in (self.queueAccount, self.queueCredit, self.queueLoan, self.queueCrisis):
+                pass
             
             current += timeToNextClient

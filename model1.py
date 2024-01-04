@@ -1,34 +1,50 @@
+import random
+import time
+
 class Client:
-    def __init__(self, value):
-        self.value = value
+    id = 0
+    
+    def __init__(self):
+        
+        self.waitingTime = 0
+        self.serviceTime = 0
         self.next = None
         self.previous = None
+        self.select_a_case()
         
     def select_a_case(self):
+        cases = ['personal account', 'credits', 'loans', 'crisis situation']
+        probabilities = [0.5, 0.3, 0.25, 0.2]
+        self.case = random.choices(cases, weights=probabilities)
         
+    def generate_id(self):
+        self.id = id
+        Client.id += 1
         
     def __str__(self):
-        return self.value
+        return self.case
         
 class Queue:
-    def __init__(self, head : Node):
-        self.head = head
-        self.tail : Node = head
-        self.length = 1
-    
-    def append_node(self, node : Node):
+    def __init__(self, amountOfSpecialists):
+        
+        self.head = None
+        self.tail = None
+        self.length = 0
+        self.amountOfSpecialists = amountOfSpecialists
+        
+    def append_client(self, Client : Client):
         if self.tail == None:
-            self.head = node
-            self.tail = node
+            self.head = Client
+            self.tail = Client
             self.length += 1
         else:
-            self.tail.next = node
-            self.tail = node
+            self.tail.next = Client
+            self.tail = Client
             self.length += 1
     
     def dequeue(self):
         if self.head != None:
-            print(self.head.value)
+            print(self.head.case)
             popped = self.head
             self.head = self.head.next
             self.length -= 1
@@ -41,17 +57,40 @@ class Queue:
         
     def front(self):
         if self.head != None:
-            print(f'Current front is {self.head.value}')
+            print(f'Current front is {self.head.id}')
         else:
             print('Queue is empty')
     
     def __str__(self):
-        listOfNodes = []
+        listOfClients = []
         if self.head == None:
             return 'Queue is empty :('
         else:
             current = self.head
             while current:
-                listOfNodes.append(str(current.value))
+                listOfClients.append(str(current.id))
                 current = current.next
-            return ', '.join(listOfNodes)
+            return ', '.join(listOfClients)
+
+
+#zakladam 4 specjalistów konta, 3 kredyty, 2 pozyczki i 2 kryzys
+class Simulation:
+    
+    def __init__(self, day : str):
+        self.queueAccount = Queue()
+        self.queueCredit = Queue()
+        self.queueLoan = Queue()
+        self.queueCrisis = Queue()
+        
+        if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
+            self.flowOfClients = 
+            self.startTime = 
+        else:
+            self.flowOfClients = 
+            self.startTime = 
+          
+    def simulate(self, timeToSimulate):
+        currentTime = 0
+        
+        while currentTime < timeToSimulate:
+            

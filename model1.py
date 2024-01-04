@@ -23,14 +23,24 @@ class Client:
         
     def __str__(self):
         return self.case
-        
+
+class Employee:
+    def __init__(self):
+        self.status = 'free'
+        self.currentClient = None
+        self.timeLeft = 0
+    
+    def changeClient(self):
+        self.timeLeft += 1
+    
+ 
 class Queue:
     def __init__(self, amountOfSpecialists):
         
         self.head = None
         self.tail = None
         self.length = 0
-        self.amountOfSpecialists = amountOfSpecialists
+        self.employees = [Employee() for _ in range(amountOfSpecialists)]
         
     def append_client(self, Client : Client):
         if self.tail == None:
@@ -77,20 +87,20 @@ class Queue:
 class Simulation:
     
     def __init__(self, day : str):
-        self.queueAccount = Queue()
-        self.queueCredit = Queue()
-        self.queueLoan = Queue()
-        self.queueCrisis = Queue()
+        self.queueAccount = Queue(4)
+        self.queueCredit = Queue(3)
+        self.queueLoan = Queue(2)
+        self.queueCrisis = Queue(2)
         
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
-            self.flowOfClients = 
-            self.startTime = 
+            self.flowOfClients = 4
+            self.startTime = "8:00:00"
         else:
-            self.flowOfClients = 
-            self.startTime = 
+            self.flowOfClients = 8
+            self.startTime = "9:00:00"
           
     def simulate(self, timeToSimulate):
-        currentTime = 0
+        current = 0
         
-        while currentTime < timeToSimulate:
+        while current < timeToSimulate:
             

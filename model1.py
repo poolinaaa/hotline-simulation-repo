@@ -1,11 +1,13 @@
 import random
 import time
+from datetime import timedelta
 
 class Client:
     id = 0
     
-    def __init__(self):
+    def __init__(self, arrivalTime):
         
+        self.arrivalTime = arrivalTime
         self.waitingTime = 0
         self.serviceTime = 0
         self.next = None
@@ -32,6 +34,12 @@ class Employee:
     
     def changeClient(self):
         self.timeLeft += 1
+        
+    def change_status(self):
+        if self.status == 'free':
+            self.status = 'occupied'
+        else:
+            self.status = 'free'
     
  
 class Queue:
@@ -62,6 +70,15 @@ class Queue:
         else:
             print('Queue is empty')
     
+    def checkStatusEmployees(self):
+        for emp in range(len(self.employees)):
+            if self.employees[emp].status == 'free' and self.length != 0:
+                self.employees[emp].currentClient = self.dequeue()
+                self.employees[emp].change_status()
+                #ZAKTUALIZUJ CZAS POZOSTALY PRACOWNIKOWI
+                
+                
+                
     def size(self):
         print(f'Current length of the queue is {self.length}')
         
@@ -98,9 +115,28 @@ class Simulation:
         else:
             self.flowOfClients = 8
             self.startTime = "9:00:00"
-          
+    
+    def check_case_of_client(self, client : Client):
+        if client.case == 'personal account':
+            self.queueAccount.append_client(client)
+        elif client.case == 'credits':
+            self.queueCredit.append_client(client)
+        elif client.case == 'loans':
+            self.queueLoan.append_client(client)
+        else:
+            self.queueCrisis.append_client(client)
+            
     def simulate(self, timeToSimulate):
         current = 0
-        
+        now = self.startTime
         while current < timeToSimulate:
+            timeToNextClient = random.expovariate(self.flowOfClients)
             
+            now = self.startTime + timedelta(minutes=current)
+            client = Client(now)
+            self.check_case_of_client(client)
+            
+            
+            
+            
+            current += timeToNextClient

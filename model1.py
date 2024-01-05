@@ -1,6 +1,7 @@
 import random
 import time
 from datetime import timedelta, datetime
+import math
 
 #klasa klient
 class Client:
@@ -17,6 +18,7 @@ class Client:
         self.next = None
         self.previous = None
         self.select_a_case()
+        self.generate_id()
 
     #losowanie problemu klienta
     def select_a_case(self, cases = ['personal account', 'credits', 'loans', 'crisis situation'], probabilities = [0.5, 0.3, 0.25, 0.2]):
@@ -149,11 +151,11 @@ class Simulation:
         self.queueCrisis = Queue(2)
 
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
-            self.flowOfClients = 4
+            self.flowOfClients = 1/240
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
         else:
-            self.flowOfClients = 8
+            self.flowOfClients = 1/480
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=9)
 
@@ -172,14 +174,21 @@ class Simulation:
     def simulate(self, timeToSimulate):
         current = 0
         now = self.startTime 
-
+        timeToNextClient = math.ceil(random.expovariate(self.flowOfClients))
+        print(timeToNextClient)
+        clientArrival = self.startTime + timedelta(seconds=timeToNextClient)
+        
         while current < timeToSimulate * 3600:  
             #TUTAJ TRZEBA DODAC GENEROWANIE NAPLYWU KLIENTOW
+            
             now = self.startTime + timedelta(seconds=current)
-            client = Client(now)
-            self.clientsArrivals.append(now)
-            self.check_case_of_client(client)
-
+            
+            if now == clientArrival:
+                client = Client(now)
+                self.clientsArrivals.append(now)
+                self.check_case_of_client(client)
+                timeToNextClient = math.ceil(random.expovariate(self.flowOfClients))
+                clientArrival = now + timedelta(seconds=timeToNextClient)
             
             for queue in (self.queueAccount, self.queueCredit, self.queueLoan, self.queueCrisis):
                 queue.checkStatusEmployees()

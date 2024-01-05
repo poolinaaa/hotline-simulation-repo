@@ -25,13 +25,13 @@ class Client:
     #losowanie czasu potrzebnego na obsluge
     def generate_service_time(self):
         if self.case == 'personal account':
-            self.draw_time(6, 3)
+            self.draw_time(360, 180)
         elif self.case == 'credits':
-            self.draw_time(12, 2)
+            self.draw_time(720, 120)
         elif self.case == 'loans':
-            self.draw_time(10, 2)
+            self.draw_time(600, 120)
         else:
-            self.draw_time(15, 3)
+            self.draw_time(900, 180)
             
     def draw_time(self, mu, sigma):
         self.serviceTime = random.gauss(mu, sigma)
@@ -77,7 +77,7 @@ class Employee:
             self.currentClient.generate_service_time()
             
 
-# tutaj też zaktualizuje czas pracownika
+
 
 
 class Queue:
@@ -142,6 +142,7 @@ class Queue:
 class Simulation:
 
     def __init__(self, day: str):
+        self.clientsArrivals = []
         self.queueAccount = Queue(4)
         self.queueCredit = Queue(3)
         self.queueLoan = Queue(2)
@@ -173,9 +174,10 @@ class Simulation:
         now = self.startTime 
 
         while current < timeToSimulate * 3600:  
-            
+            #TUTAJ TRZEBA DODAC GENEROWANIE NAPLYWU KLIENTOW
             now = self.startTime + timedelta(seconds=current)
             client = Client(now)
+            self.clientsArrivals.append(now)
             self.check_case_of_client(client)
 
             
@@ -196,3 +198,8 @@ class Simulation:
                         employee.change_status()
 
             current += 1
+            
+        print(self.clientsArrivals)  
+
+sim = Simulation('monday')    
+sim.simulate(2)    

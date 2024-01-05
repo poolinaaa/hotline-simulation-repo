@@ -127,8 +127,6 @@ class Queue:
                 else:
                     return False
                 
-                # ZAKTUALIZUJ CZAS POZOSTALY PRACOWNIKOWI
-
     def size(self):
         print(f'Current length of the queue is {self.length}')
 
@@ -195,7 +193,7 @@ class Simulation:
             
             if now == clientArrival:
                 client = Client(now)
-                self.clientsArrivals.append(now)
+                self.clientsArrivals.append(now.strftime("%H:%M:%S"))
                 self.check_case_of_client(client)
                 timeToNextClient = math.ceil(random.expovariate(self.flowOfClients))
                 clientArrival = now + timedelta(seconds=timeToNextClient)
@@ -211,7 +209,6 @@ class Simulation:
                     current_client.waitingTime += 1
                     current_client = current_client.next
 
-            
             for employee in self.queueAccount.employees + self.queueCredit.employees + self.queueLoan.employees + self.queueCrisis.employees:
                 if employee.status == 'occupied':
                     employee.timeLeft -= 1
@@ -222,5 +219,5 @@ class Simulation:
             
         print(self.clientsArrivals)  
 
-sim = Simulation('monday')    
+sim = Simulation('saturday')    
 sim.simulate(2)    

@@ -27,14 +27,15 @@ class Client:
     # losowanie problemu klienta
     def select_a_case(self, cases=['personal account', 'credits', 'loans', 'crisis situation'], probabilities=[0.5, 0.3, 0.25, 0.2]):
         self.case = random.choices(cases, weights=probabilities)
+        
 
     # losowanie czasu potrzebnego na obsluge
     def generate_service_time(self):
-        if self.case == 'personal account':
+        if self.case == ['personal account']:
             self.draw_time(360, 180)
-        elif self.case == 'credits':
+        elif self.case == ['credits']:
             self.draw_time(720, 120)
-        elif self.case == 'loans':
+        elif self.case == ['loans']:
             self.draw_time(600, 120)
         else:
             self.draw_time(900, 180)
@@ -67,7 +68,7 @@ class Employee:
         self.timeLeft += 60
 
     def change_status(self):
-        if self.status == 'free' and self.currentClient is not None:
+        if self.status == 'free':
             self.status = 'occupied'
         
         else:
@@ -118,8 +119,7 @@ class Queue:
             self.head = self.head.next
             self.length -= 1
             return popped
-        else:
-            print('Queue is empty')
+        
 
     def checkStatusEmployees(self):
         for emp in range(len(self.employees)):
@@ -130,6 +130,7 @@ class Queue:
                     return self.employees[emp].currentClient
                 else:
                     return False
+
 
     def size(self):
         print(f'Current length of the queue is {self.length}')
@@ -175,14 +176,18 @@ class Simulation:
                 microsecond=0, second=0, minute=0, hour=9)
 
     def check_case_of_client(self, client: Client):
-        if client.case == 'personal account':
+        if client.case == ['personal account']:
             self.queueAccount.append_client(client)
-        elif client.case == 'credits':
+            
+        elif client.case == ['credits']:
+            
             self.queueCredit.append_client(client)
-        elif client.case == 'loans':
+        elif client.case == ['loans']:
             self.queueLoan.append_client(client)
+            
         else:
             self.queueCrisis.append_client(client)
+            
 
     def simulate(self, timeToSimulate):
         current = 0
@@ -196,6 +201,7 @@ class Simulation:
 
             if now == clientArrival:
                 client = Client(now)
+                print(client.case)
                 self.clientsArrivals.append(now.strftime("%H:%M:%S"))
                 self.check_case_of_client(client)
                 timeToNextClient = math.ceil(
@@ -210,8 +216,11 @@ class Simulation:
             for queue in (self.queueAccount, self.queueCredit, self.queueLoan, self.queueCrisis):
                 current_client = queue.head
                 while current_client:
+                    
                     current_client.waitingTime += 1
                     current_client = current_client.next
+
+            
 
             for employee in self.queueAccount.employees + self.queueCredit.employees + self.queueLoan.employees + self.queueCrisis.employees:
                 
@@ -221,23 +230,21 @@ class Simulation:
                 elif employee.statusChangingClient == True and employee.breakLeft > 0:
                     employee.breakLeft -= 1
                 
-                if employee.status == 'occupied' and employee.timeLeft > 0:
-                    employee.timeLeft -= 1
-                    if employee.timeLeft == 0:
-                        employee.change_status()
-                        employee.statusChangingClient = True
-                        employee.breakLeft = 15
-                
-                if employee.status == 'occupied' and employee.timeLeft == 0 and employee.currentClient is not None:
-                    
-                    served_client_data = {
+                if employee.status == 'occupied':
+                    if employee.timeLeft > 0:
+                        employee.timeLeft -= 1
+                        if employee.timeLeft == 0:
+                            served_client_data = {
                         'id': employee.currentClient.id,
-                        'case': str(employee.currentClient),
+                        'case': str(employee.currentClient.case),
                         'arrival_time': employee.currentClient.arrivalTime,
                         'waiting_time': employee.currentClient.waitingTime,
                         'service_time': employee.currentClient.serviceTime
-                    }
-                    self.clients_data.append(served_client_data)
+                        }
+                            self.clients_data.append(served_client_data)
+                            employee.change_status()
+                            employee.statusChangingClient = True
+                            employee.breakLeft = 15
 
             current += 1
 

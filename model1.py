@@ -32,19 +32,19 @@ class Client:
     # losowanie czasu potrzebnego na obsluge
     def generate_service_time(self):
         if self.case == ['personal account']:
-            self.draw_time(360, 180)
+            self.draw_time(100, 20)
         elif self.case == ['credits']:
-            self.draw_time(720, 120)
+            self.draw_time(300, 120)
         elif self.case == ['loans']:
-            self.draw_time(600, 120)
+            self.draw_time(500, 120)
         else:
-            self.draw_time(900, 180)
+            self.draw_time(600, 180)
         return self.serviceTime
 
     def draw_time(self, mu, sigma):
-        self.serviceTime = random.gauss(mu, sigma)
+        self.serviceTime = math.ceil(random.gauss(mu, sigma))
         while self.serviceTime < 0:
-            self.serviceTime = random.gauss(mu, sigma)
+            self.serviceTime = math.ceil(random.gauss(mu, sigma))
 
     # indywidualny nr klienta
 
@@ -79,7 +79,7 @@ class Employee:
         probMistake = 0.2
         randNumber = random.uniform(0, 1)
 
-        if self.currentClient is not None:
+        if self.currentClient:
             # klient źle wybrał
             if randNumber <= probMistake:
                 wrongCase = self.currentClient.case
@@ -116,7 +116,8 @@ class Queue:
         if self.head != None:
             print(self.head.case)
             popped = self.head
-            self.head = self.head.next
+            if self.head.next != None:
+                self.head = self.head.next
             self.length -= 1
             return popped
         
@@ -226,10 +227,12 @@ class Simulation:
                 
                 if employee.statusChangingClient == True and employee.breakLeft == 0:
                     employee.statusChangingClient = False
+                    
                 
                 elif employee.statusChangingClient == True and employee.breakLeft > 0:
                     employee.breakLeft -= 1
-                
+                    
+                    
                 if employee.status == 'occupied':
                     if employee.timeLeft > 0:
                         employee.timeLeft -= 1
@@ -237,12 +240,14 @@ class Simulation:
                             served_client_data = {
                         'id': employee.currentClient.id,
                         'case': str(employee.currentClient.case),
-                        'arrival_time': employee.currentClient.arrivalTime,
+                        'arrival_time': employee.currentClient.arrivalTime.strftime("%H:%M:%S"),
                         'waiting_time': employee.currentClient.waitingTime,
                         'service_time': employee.currentClient.serviceTime
                         }
                             self.clients_data.append(served_client_data)
+                            
                             employee.change_status()
+                            
                             employee.statusChangingClient = True
                             employee.breakLeft = 15
 

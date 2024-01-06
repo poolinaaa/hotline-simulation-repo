@@ -3,30 +3,32 @@ import time
 from datetime import timedelta, datetime
 import math
 
-#klasa klient
+# klasa klient
+
+
 class Client:
     id = 0
 
     def __init__(self, arrivalTime):
 
-        #czas w którym klient pojawił się w systemie
+        # czas w którym klient pojawił się w systemie
         self.arrivalTime = arrivalTime
-        #czas w kolejce / przełączania do innego specjalisty
+        # czas w kolejce / przełączania do innego specjalisty
         self.waitingTime = 0
-        #czas obsługi
+        # czas obsługi
         self.serviceTime = 0
         self.next = None
         self.previous = None
         self.served = False
-        
+
         self.select_a_case()
         self.generate_id()
 
-    #losowanie problemu klienta
-    def select_a_case(self, cases = ['personal account', 'credits', 'loans', 'crisis situation'], probabilities = [0.5, 0.3, 0.25, 0.2]):
+    # losowanie problemu klienta
+    def select_a_case(self, cases=['personal account', 'credits', 'loans', 'crisis situation'], probabilities=[0.5, 0.3, 0.25, 0.2]):
         self.case = random.choices(cases, weights=probabilities)
 
-    #losowanie czasu potrzebnego na obsluge
+    # losowanie czasu potrzebnego na obsluge
     def generate_service_time(self):
         if self.case == 'personal account':
             self.draw_time(360, 180)
@@ -37,14 +39,14 @@ class Client:
         else:
             self.draw_time(900, 180)
         return self.serviceTime
-            
+
     def draw_time(self, mu, sigma):
         self.serviceTime = random.gauss(mu, sigma)
         while self.serviceTime < 0:
             self.serviceTime = random.gauss(mu, sigma)
-        
-    
-    #indywidualny nr klienta
+
+    # indywidualny nr klienta
+
     def generate_id(self):
         self.id = Client.id
         Client.id += 1
@@ -58,13 +60,16 @@ class Employee:
         self.status = 'free'
         self.currentClient = None
         self.timeLeft = 0
+        self.statusChangingClient = False
+        self.breakLeft = 0
 
     def changeClient(self):
         self.timeLeft += 60
 
     def change_status(self):
-        if self.status == 'free':
+        if self.status == 'free' and self.currentClient is not None:
             self.status = 'occupied'
+        
         else:
             self.status = 'free'
 
@@ -72,21 +77,20 @@ class Employee:
     def check_choice_of_case(self):
         probMistake = 0.2
         randNumber = random.uniform(0, 1)
-        
+
         if self.currentClient is not None:
-            #klient źle wybrał
+            # klient źle wybrał
             if randNumber <= probMistake:
                 wrongCase = self.currentClient.case
-                self.currentClient.select_a_case(cases = list(set(['personal account', 'credits', 'loans', 'crisis situation'])-set(wrongCase)), 
-                                                probabilities = [1,1,1])
+                self.currentClient.select_a_case(cases=list(set(['personal account', 'credits', 'loans', 'crisis situation'])-set(wrongCase)),
+                                                 probabilities=[1, 1, 1])
                 self.changeClient()
                 return True
-            #klient dobrze wybrał
+            # klient dobrze wybrał
             else:
                 serviceTime = self.currentClient.generate_service_time()
                 self.timeLeft = serviceTime
                 return False
-            
 
 
 class Queue:
@@ -119,14 +123,14 @@ class Queue:
 
     def checkStatusEmployees(self):
         for emp in range(len(self.employees)):
-            if self.employees[emp].status == 'free' and self.length != 0:
+            if self.employees[emp].status == 'free' and self.length != 0 and self.employees[emp].statusChangingClient != True:
                 self.employees[emp].change_status()
                 self.employees[emp].currentClient = self.dequeue()
                 if self.employees[emp].check_choice_of_case():
                     return self.employees[emp].currentClient
                 else:
                     return False
-                
+
     def size(self):
         print(f'Current length of the queue is {self.length}')
 
@@ -155,6 +159,7 @@ class Simulation:
 
     def __init__(self, day: str):
         self.clientsArrivals = []
+        self.clients_data = []
         self.queueAccount = Queue(4)
         self.queueCredit = Queue(3)
         self.queueLoan = Queue(2)
@@ -179,25 +184,24 @@ class Simulation:
         else:
             self.queueCrisis.append_client(client)
 
-
-
     def simulate(self, timeToSimulate):
         current = 0
-        now = self.startTime 
+        now = self.startTime
         timeToNextClient = math.ceil(random.expovariate(self.flowOfClients))
         clientArrival = self.startTime + timedelta(seconds=timeToNextClient)
-        
-        while current < timeToSimulate * 3600:  
-            
+
+        while current < timeToSimulate * 3600:
+
             now = self.startTime + timedelta(seconds=current)
-            
+
             if now == clientArrival:
                 client = Client(now)
                 self.clientsArrivals.append(now.strftime("%H:%M:%S"))
                 self.check_case_of_client(client)
-                timeToNextClient = math.ceil(random.expovariate(self.flowOfClients))
+                timeToNextClient = math.ceil(
+                    random.expovariate(self.flowOfClients))
                 clientArrival = now + timedelta(seconds=timeToNextClient)
-            
+
             for queue in (self.queueAccount, self.queueCredit, self.queueLoan, self.queueCrisis):
                 clientToRedirect = queue.checkStatusEmployees()
                 if clientToRedirect:
@@ -210,14 +214,35 @@ class Simulation:
                     current_client = current_client.next
 
             for employee in self.queueAccount.employees + self.queueCredit.employees + self.queueLoan.employees + self.queueCrisis.employees:
-                if employee.status == 'occupied':
+                
+                if employee.statusChangingClient == True and employee.breakLeft == 0:
+                    employee.statusChangingClient = False
+                
+                elif employee.statusChangingClient == True and employee.breakLeft > 0:
+                    employee.breakLeft -= 1
+                
+                if employee.status == 'occupied' and employee.timeLeft > 0:
                     employee.timeLeft -= 1
                     if employee.timeLeft == 0:
                         employee.change_status()
+                        employee.statusChangingClient = True
+                        employee.breakLeft = 15
+                
+                if employee.status == 'occupied' and employee.timeLeft == 0 and employee.currentClient is not None:
+                    
+                    served_client_data = {
+                        'id': employee.currentClient.id,
+                        'case': str(employee.currentClient),
+                        'arrival_time': employee.currentClient.arrivalTime,
+                        'waiting_time': employee.currentClient.waitingTime,
+                        'service_time': employee.currentClient.serviceTime
+                    }
+                    self.clients_data.append(served_client_data)
 
             current += 1
-            
-        print(self.clientsArrivals)  
 
-sim = Simulation('saturday')    
-sim.simulate(2)    
+        print(self.clientsArrivals)
+        print("Clients data:", self.clients_data)
+
+sim = Simulation('saturday')
+sim.simulate(2)

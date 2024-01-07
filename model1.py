@@ -280,14 +280,15 @@ class Simulation:
                                 'case': str(employee.currentClient.case),
                                 'arrival_time': employee.currentClient.arrivalTime.strftime("%H:%M:%S"),
                                 'waiting_time': employee.currentClient.waitingTime,
-                                'service_time': employee.currentClient.serviceTime
+                                'service_time': employee.currentClient.serviceTime,
+                                'employee id' : employee.id
                             }
                             self.clients_data.append(served_client_data)
                             served_client_data = {}
                             print(now)
-                            print('klient obsłuzony id:')
+                            
                             print(employee.currentClient.id)
-                            print(f"przez pracownika o id {employee.id}")
+                            
 
                             employee.change_status()
                             print(employee.status)

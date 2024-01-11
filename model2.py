@@ -91,18 +91,7 @@ class Employee:
                 self.timeLeft = serviceTime
                 return False
 
-    def tough_cases(self):
-        probThoughCase = 0.3
-        randNumberT = random.uniform(0, 1)
-
-        if self.currentClient:
-            # trudna sprawa
-            if randNumberT <= probThoughCase:
-                return True
-            # łatwa sprawa
-            else:
-                return False
-
+    
 
 class Queue:
     def __init__(self, amountOfSpecialists):
@@ -146,11 +135,23 @@ class Queue:
                 if self.employees[emp].check_choice_of_case():
                     toRedirect = self.employees[emp].currentClient
                     self.employees[emp].currentClient = None
-
+                    print(f"redirected {toRedirect.id}")
+                    print()
+                    toRedirect.redirected = True
+                    print(toRedirect.redirected)
                     return toRedirect
                 else:
                     return False
-
+                
+    def checkStatusEmployeesTough(self):
+        for emp in range(len(self.employees)):
+            if self.employees[emp].status == 'free' and self.length != 0 and self.employees[emp].statusChangingClient != True:
+                self.employees[emp].change_status()
+                self.employees[emp].currentClient = self.dequeue()
+                serviceTime = self.employees[emp].currentClient.generate_service_time()
+                self.employees[emp].timeLeft = serviceTime
+                print(f'czas obslugi {self.employees[emp].timeLeft}')
+                
     def size(self):
         print(f'Current length of the queue is {self.length}')
 
@@ -180,7 +181,7 @@ class Simulation:
     def __init__(self, day: str):
         self.clientsArrivals = []
         self.clients_data = []
-        self.queueGeneral = Queue(9)
+        self.queueGeneral = Queue(1)
         self.queueToughCase = Queue(2)
 
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
@@ -213,9 +214,11 @@ class Simulation:
                 
             
             clientToRedirect = self.queueGeneral.checkStatusEmployeesGeneral()
+            self.queueToughCase.checkStatusEmployeesTough()
             if clientToRedirect:
-                clientToRedirect.redirected = True
+            
                 self.queueToughCase.append_client(clientToRedirect)
+                print(self.queueToughCase)
 
             for queue in (self.queueGeneral, self.queueToughCase):
                 current_clients = queue.head

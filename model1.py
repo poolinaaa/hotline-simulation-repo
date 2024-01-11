@@ -197,11 +197,11 @@ class Simulation:
         self.queueCrisis = Queue(2)
 
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
-            self.flowOfClients = 1/240
+            self.flowOfClients = 1/200
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
         else:
-            self.flowOfClients = 1/480
+            self.flowOfClients = 1/200
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=9)
 

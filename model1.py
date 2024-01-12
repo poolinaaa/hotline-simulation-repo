@@ -131,12 +131,12 @@ class Queue:
 
     def dequeue(self):
         if self.head != None:
-            print(self.head.case)
+
             popped = self.head
             if self.head.next != None:
                 self.head = self.head.next
             else:
-                
+
                 self.head = None
                 self.tail = None
 
@@ -191,17 +191,17 @@ class Simulation:
     def __init__(self, day: str):
         self.clientsArrivals = []
         self.clients_data = []
-        self.queueAccount = Queue(4)
+        self.queueAccount = Queue(3)
         self.queueCredit = Queue(3)
-        self.queueLoan = Queue(2)
+        self.queueLoan = Queue(3)
         self.queueCrisis = Queue(2)
 
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
-            self.flowOfClients = 1/200
+            self.flowOfClients = 1/60
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
         else:
-            self.flowOfClients = 1/200
+            self.flowOfClients = 1/65
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=9)
 
@@ -265,7 +265,7 @@ class Simulation:
                     if employee.timeLeft > 0:
                         employee.timeLeft -= 1
                         if employee.timeLeft == 0 and employee.currentClient != None and employee.statusChangingClient != True:
-                            print(now)
+
                             served_client_data = {
                                 'id': employee.currentClient.id,
                                 'case': str(employee.currentClient.case),
@@ -276,14 +276,11 @@ class Simulation:
                             }
                             self.clients_data.append(served_client_data)
                             served_client_data = {}
-                            print(now)
-
-                            print(employee.currentClient.id)
 
                             employee.change_status()
-                            print(employee.status)
+
                             employee.currentClient = None
-                            print(employee.currentClient)
+
                             employee.statusChangingClient = True
                             employee.timeLeft = 15
                         elif employee.timeLeft == 0 and employee.currentClient == None:
@@ -294,5 +291,5 @@ class Simulation:
         print("Clients data:", self.clients_data)
 
 
-sim = Simulation('saturday')
-sim.simulate(2)
+sim = Simulation('monday')
+sim.simulate(3)

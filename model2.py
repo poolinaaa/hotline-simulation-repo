@@ -181,15 +181,15 @@ class Simulation:
     def __init__(self, day: str):
         self.clientsArrivals = []
         self.clients_data = []
-        self.queueGeneral = Queue(1)
-        self.queueToughCase = Queue(2)
+        self.queueGeneral = Queue(5)
+        self.queueToughCase = Queue(6)
 
         if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
-            self.flowOfClients = 1/240
+            self.flowOfClients = 1/50
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
         else:
-            self.flowOfClients = 1/480
+            self.flowOfClients = 1/65
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=9)
 
@@ -262,5 +262,5 @@ class Simulation:
         print("Clients data:", self.clients_data)
 
 
-sim = Simulation('saturday')
-sim.simulate(2)
+sim = Simulation('monday')
+sim.simulate(3)

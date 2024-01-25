@@ -183,10 +183,10 @@ class Simulation:
     def __init__(self, day: str):
         self.clientsArrivals = []
         self.clients_data = []
-        self.queueAccount = Queue(2)
+        self.queueAccount = Queue(3)
         self.queueCredit = Queue(2)
         self.queueLoan = Queue(2)
-        self.queueCrisis = Queue(2)
+        self.queueCrisis = Queue(1)
 
         if day in ('monday'):
             self.flowOfClients = 1/60
@@ -291,8 +291,9 @@ class Simulation:
             current += 1
 
         
-        print("Clients data:", self.clients_data)
+        #print("Clients data:", self.clients_data)
 
 
 sim = Simulation('friday')
-sim.simulate(5)
+sim.simulate(4)
+print('finiszed')

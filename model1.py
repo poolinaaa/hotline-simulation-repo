@@ -119,8 +119,6 @@ class Queue:
             self.tail = Client
             self.length += 1
 
-    
-
     def dequeue(self):
         if self.head != None:
 
@@ -192,17 +190,17 @@ class Simulation:
             self.flowOfClients = 1/60
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
-            
+
         if day in ('tuesday', 'wednesday', 'thursday'):
             self.flowOfClients = 1/80
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
-            
+
         if day in ('friday'):
             self.flowOfClients = 1/65
             self.startTime = datetime.now().replace(
-                microsecond=0, second=0, minute=0, hour=8)   
-        
+                microsecond=0, second=0, minute=0, hour=8)
+
         else:
             self.flowOfClients = 1/70
             self.startTime = datetime.now().replace(
@@ -290,10 +288,9 @@ class Simulation:
                             employee.change_status()
             current += 1
 
-        
-        #print("Clients data:", self.clients_data)
+        print("Clients data:", self.clients_data)
 
 
 sim = Simulation('friday')
-sim.simulate(4)
+sim.simulate(3)
 print('finiszed')

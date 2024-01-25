@@ -291,6 +291,21 @@ class Simulation:
         print("Clients data:", self.clients_data)
 
 
-sim = Simulation('friday')
+sim = Simulation('monday')
 sim.simulate(3)
 print('finiszed')
+
+
+def add_data_to_file(file_name, clients_data):
+    try:
+        with open(file_name, 'a') as file:
+            for client in clients_data:
+                file.write(f"{client}\n")
+        print("Data has been successfully added to the file.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+plik = 'clients_data.txt'
+
+add_data_to_file(plik, sim.clients_data)

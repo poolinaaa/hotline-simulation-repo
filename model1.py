@@ -299,12 +299,12 @@ print('finiszed')
 def add_data_to_file(file_name, clients_data):
     try:
         with open(file_name, 'a') as file:
-            file.write(clients_data)
+            file.write(f"{clients_data}")
         print("Data has been successfully added to the file.")
     except Exception as e:
         print(f"An error occurred: {e}")
 
 
-plik = 'clients_data.txt'
+plik = 'model1.txt'
 
 add_data_to_file(plik, sim.clients_data)

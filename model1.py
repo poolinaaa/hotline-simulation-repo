@@ -291,7 +291,7 @@ class Simulation:
         print("Clients data:", self.clients_data)
 
 
-sim = Simulation('tuesday')
+sim = Simulation('sunday')
 sim.simulate(3)
 print('finiszed')
 

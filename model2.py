@@ -182,14 +182,25 @@ class Simulation:
         self.clientsArrivals = []
         self.clients_data = []
         self.queueGeneral = Queue(5)
-        self.queueToughCase = Queue(6)
+        self.queueToughCase = Queue(3)
 
-        if day in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday'):
-            self.flowOfClients = 1/50
+        if day in ('monday'):
+            self.flowOfClients = 1/60
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=8)
-        else:
+            
+        if day in ('tuesday', 'wednesday', 'thursday'):
+            self.flowOfClients = 1/80
+            self.startTime = datetime.now().replace(
+                microsecond=0, second=0, minute=0, hour=8)
+            
+        if day in ('friday'):
             self.flowOfClients = 1/65
+            self.startTime = datetime.now().replace(
+                microsecond=0, second=0, minute=0, hour=8)   
+        
+        else:
+            self.flowOfClients = 1/70
             self.startTime = datetime.now().replace(
                 microsecond=0, second=0, minute=0, hour=9)
 
@@ -262,5 +273,5 @@ class Simulation:
         print("Clients data:", self.clients_data)
 
 
-sim = Simulation('monday')
-sim.simulate(3)
+sim = Simulation('sunday')
+sim.simulate(10)

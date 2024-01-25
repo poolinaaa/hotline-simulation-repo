@@ -119,15 +119,7 @@ class Queue:
             self.tail = Client
             self.length += 1
 
-    def dequeue(self):
-        if self.head != None:
-
-            popped = self.head
-            if self.head.next != None:
-                self.head = self.head.next
-
-            self.length -= 1
-            return popped
+    
 
     def dequeue(self):
         if self.head != None:
@@ -298,9 +290,9 @@ class Simulation:
                             employee.change_status()
             current += 1
 
-        print(self.clientsArrivals)
+        
         print("Clients data:", self.clients_data)
 
 
 sim = Simulation('friday')
-sim.simulate(2)
+sim.simulate(5)

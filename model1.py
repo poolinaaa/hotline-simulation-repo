@@ -309,4 +309,25 @@ plik = 'model1.txt'
 
 #add_data_to_file(plik, sim.clients_data)
 
+with open('model2.txt', 'r') as file:
+    lines = file.readlines()  # Wczytanie wszystkich linii z pliku
 
+waiting = []  # Inicjalizacja listy czasów oczekiwania dla każdego odpalenia
+
+# Przetwarzanie linii danych
+temp_list = []  # Tymczasowa lista na czas oczekiwania jednego odpalenia
+for line in lines:
+    if line.strip():  # Sprawdzenie, czy linia nie jest pusta
+        if line.startswith('SATURDAY'):  # Pominięcie wierszy z nagłówkiem
+            continue
+        if line.startswith('END'):  # Zakończenie wczytywania danych
+            waiting.append(temp_list)  # Dodanie czasów oczekiwania do listy waiting
+            break
+        # Parsowanie danych w linii jako słownik
+        data = eval(line.strip())
+        # Dodanie czasów oczekiwania klientów do listy tymczasowej
+        temp_list.append([entry['waiting_time'] for entry in data])
+dt = waiting[0]
+# Sprawdzenie wyniku
+
+add_data_to_file('waiting_model2.txt', dt)

@@ -292,7 +292,7 @@ class Simulation:
 
 
 sim = Simulation('sunday')
-sim.simulate(3)
+sim.simulate(0.2)
 print('finiszed')
 
 
@@ -307,4 +307,25 @@ def add_data_to_file(file_name, clients_data):
 
 plik = 'model1.txt'
 
-add_data_to_file(plik, sim.clients_data)
+#add_data_to_file(plik, sim.clients_data)
+
+# Otwarcie pliku tekstowego
+with open('nazwa_pliku.txt', 'r') as file:
+    lines = file.readlines()  # Wczytanie wszystkich linii z pliku
+
+total_waiting_time = 0  # Inicjalizacja sumy czasów oczekiwania
+
+# Przetwarzanie linii danych
+for line in lines:
+    if line.strip():  # Sprawdzenie, czy linia nie jest pusta
+        if line.startswith('MONDAY'):  # Pominięcie wierszy z nagłówkiem
+            continue
+        # Parsowanie danych w linii jako słownik
+        data = eval(line.strip())
+        # Sumowanie czasów oczekiwania klientów
+        total_waiting_time += sum(entry['waiting_time'] for entry in data)
+
+# Obliczenie średniej oczekiwania klienta dla 10 odpaleń
+average_waiting_time = total_waiting_time / 10
+
+print("Średni czas oczekiwania klienta dla 10 odpaleń:", average_waiting_time)

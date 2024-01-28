@@ -79,15 +79,33 @@ print(modelB4means)
 
 meansWholeWeekB = meansB1 + meansB2 + meansB3 + meansB4
 print('sredniea')
-print(meansWholeWeekA)
+'''print(meansWholeWeekA)
 print('srednieb')
-print(meansWholeWeekB)
-print(f'srednia model a {mean(meansWholeWeekA)}')
-print(f'srednia model b {mean(meansWholeWeekB)}')
+print(meansWholeWeekB)'''
+#print(f'srednia model a {mean(meansWholeWeekA)}')
+#print(f'srednia model b {mean(meansWholeWeekB)}')
+t_statistic, p_value = stats.ttest_ind(meansB4, meansA4,  alternative='less')
+
+# Wyświetlenie wyników
+print("Wartość statystyki t:", t_statistic)
+print("Wartość p:", p_value)
+
+if p_value < 0.05:
+    print("Różnica w średnich jest istotna statystycznie - odrzucamy H0")
+else:
+    print("Nie ma istotnej statystycznie różnicy w średnich - nie odrzucamy H0")
 
 
+'''t_statistic, p_value = stats.ttest_ind(meansWholeWeekA, meansWholeWeekB)'''
 
+# Wyświetlenie wyników
+'''print("Wartość statystyki t:", t_statistic)
+print("Wartość p:", p_value)
 
+if p_value < 0.05:
+    print("Różnica w średnich jest istotna statystycznie - odrzucamy H0")
+else:
+    print("Nie ma istotnej statystycznie różnicy w średnich - nie odrzucamy H0")'''
 
 '''days = ['poniedziałek', 'wtorek - czwartek', 'piątek', 'sobota - niedziela']
 x = range(len(days))

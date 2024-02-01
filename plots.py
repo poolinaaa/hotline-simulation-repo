@@ -90,7 +90,7 @@ t_statistic, p_value = stats.ttest_ind(meansB4, meansA4,  alternative='less')
 print("Wartość statystyki t:", t_statistic)
 print("Wartość p:", p_value)
 
-if p_value < 0.05:
+if p_value < 0.001:
     print("Różnica w średnich jest istotna statystycznie - odrzucamy H0")
 else:
     print("Nie ma istotnej statystycznie różnicy w średnich - nie odrzucamy H0")

@@ -3,19 +3,12 @@ import time
 from datetime import timedelta, datetime
 import math
 
-# klasa klient
-
-
 class Client:
     id = 0
 
     def __init__(self, arrivalTime):
-
-        # czas w którym klient pojawił się w systemie
         self.arrivalTime = arrivalTime
-        # czas w kolejce / przełączania do innego specjalisty
         self.waitingTime = 0
-        # czas obsługi
         self.serviceTime = 0
         self.next = None
         self.previous = None
@@ -24,11 +17,8 @@ class Client:
         self.select_a_case()
         self.generate_id()
 
-    # losowanie problemu klienta
     def select_a_case(self, cases=['personal account', 'credits', 'loans', 'crisis situation'], probabilities=[0.5, 0.3, 0.25, 0.2]):
         self.case = random.choices(cases, weights=probabilities)
-
-    # losowanie czasu potrzebnego na obsluge
 
     def generate_service_time(self):
         if self.case == ['personal account']:
@@ -45,8 +35,6 @@ class Client:
         self.serviceTime = math.ceil(random.gauss(mu, sigma))
         while self.serviceTime < 0:
             self.serviceTime = math.ceil(random.gauss(mu, sigma))
-
-    # indywidualny nr klienta
 
     def generate_id(self):
         self.id = Client.id
@@ -80,21 +68,19 @@ class Employee:
         else:
             self.status = 'free'
 
-# 20 procent szans że klient wybrał źle kolejkę
     def check_choice_of_case(self):
         probMistake = 0.2
         randNumber = random.uniform(0, 1)
 
         if self.currentClient:
-            # klient źle wybrał
+            
             if randNumber <= probMistake:
                 wrongCase = self.currentClient.case
                 self.currentClient.select_a_case(cases=list(set(['personal account', 'credits', 'loans', 'crisis situation'])-set(wrongCase)),
                                                  probabilities=[1, 1, 1])
                 self.changeClient()
-
                 return True
-            # klient dobrze wybrał
+           
             else:
                 serviceTime = self.currentClient.generate_service_time()
                 self.timeLeft = serviceTime
@@ -133,15 +119,13 @@ class Queue:
             self.length -= 1
             return popped
 
-    # sprawdzanie czy można zacząc obsługiwać kolejnego
+
 
     def checkStatusEmployees(self):
         for emp in range(len(self.employees)):
             if self.employees[emp].status == 'free' and self.length != 0 and self.employees[emp].statusChangingClient != True:
-                # Zmiana statusu na occupied
                 self.employees[emp].change_status()
 
-                # Usunięcie klienta z kolejki
                 self.employees[emp].currentClient = self.dequeue()
 
                 if self.employees[emp].check_choice_of_case():
@@ -172,9 +156,6 @@ class Queue:
                 current = current.next
             return ', '.join(listOfClients)
 
-
-# zakladam 4 specjalistów konta, 3 kredyty, 2 pozyczki i 2 kryzys
-# 20 procent szans że klient wybrał źle kolejkę
 
 class Simulation:
 
@@ -238,14 +219,11 @@ class Simulation:
                     random.expovariate(self.flowOfClients))
                 clientArrival = now + timedelta(seconds=timeToNextClient)
 
-            # sprawdzanie w każdej kolejce czy można obsłużyć kolejnego klienta
             for queue in (self.queueAccount, self.queueCredit, self.queueLoan, self.queueCrisis):
-                # jeśli pracownik dostaje klienta to sprawdza czy klient wybrał dobrze kolejkę
                 clientToRedirect = queue.checkStatusEmployees()
                 if clientToRedirect:
                     self.check_case_of_client(clientToRedirect)
 
-            # zwiększanie czasu oczekiwania klientom w kolejkach
             for queue in (self.queueAccount, self.queueCredit, self.queueLoan, self.queueCrisis):
                 current_client = queue.head
                 while current_client:
@@ -256,7 +234,6 @@ class Simulation:
             for employee in self.queueAccount.employees + self.queueCredit.employees + self.queueLoan.employees + self.queueCrisis.employees:
 
                 if employee.statusChangingClient == True and employee.timeLeft == 0:
-
                     employee.statusChangingClient = False
 
                 elif employee.statusChangingClient == True and employee.timeLeft > 0:
@@ -281,9 +258,9 @@ class Simulation:
                             employee.change_status()
 
                             employee.currentClient = None
-
                             employee.statusChangingClient = True
                             employee.timeLeft = 15
+                            
                         elif employee.timeLeft == 0 and employee.currentClient == None:
                             employee.change_status()
             current += 1
@@ -292,42 +269,11 @@ class Simulation:
 
 
 sim = Simulation('sunday')
-sim.simulate(0.2)
-print('finiszed')
+sim.simulate(3)
 
 
-def add_data_to_file(file_name, clients_data):
-    try:
-        with open(file_name, 'a') as file:
-            file.write(f"{clients_data}")
-        print("Data has been successfully added to the file.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
 
 
-plik = 'model1.txt'
 
-#add_data_to_file(plik, sim.clients_data)
 
-with open('model2.txt', 'r') as file:
-    lines = file.readlines()  # Wczytanie wszystkich linii z pliku
 
-waiting = []  # Inicjalizacja listy czasów oczekiwania dla każdego odpalenia
-
-# Przetwarzanie linii danych
-temp_list = []  # Tymczasowa lista na czas oczekiwania jednego odpalenia
-for line in lines:
-    if line.strip():  # Sprawdzenie, czy linia nie jest pusta
-        if line.startswith('SATURDAY'):  # Pominięcie wierszy z nagłówkiem
-            continue
-        if line.startswith('END'):  # Zakończenie wczytywania danych
-            waiting.append(temp_list)  # Dodanie czasów oczekiwania do listy waiting
-            break
-        # Parsowanie danych w linii jako słownik
-        data = eval(line.strip())
-        # Dodanie czasów oczekiwania klientów do listy tymczasowej
-        temp_list.append([entry['waiting_time'] for entry in data])
-dt = waiting[0]
-# Sprawdzenie wyniku
-
-add_data_to_file('waiting_model2.txt', dt)

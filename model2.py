@@ -3,19 +3,13 @@ import time
 from datetime import timedelta, datetime
 import math
 
-# klasa klient
-
-
 class Client:
     id = 0
 
     def __init__(self, arrivalTime):
 
-        # czas w którym klient pojawił się w systemie
         self.arrivalTime = arrivalTime
-        # czas w kolejce / przełączania do innego specjalisty
         self.waitingTime = 0
-        # czas obsługi
         self.serviceTime = 0
         self.next = None
         self.previous = None
@@ -24,11 +18,9 @@ class Client:
         self.select_a_case()
         self.generate_id()
 
-    # losowanie problemu klienta
     def select_a_case(self, cases=['personal account', 'credits', 'loans', 'crisis situation'], probabilities=[0.5, 0.3, 0.25, 0.2]):
         self.case = random.choices(cases, weights=probabilities)
 
-    # losowanie czasu potrzebnego na obsluge
 
     def generate_service_time(self):
         if self.case == ['personal account']:
@@ -45,8 +37,6 @@ class Client:
         self.serviceTime = math.ceil(random.gauss(mu, sigma))
         while self.serviceTime < 0:
             self.serviceTime = math.ceil(random.gauss(mu, sigma))
-
-    # indywidualny nr klienta
 
     def generate_id(self):
         self.id = Client.id
@@ -74,18 +64,16 @@ class Employee:
         else:
             self.status = 'free'
 
-# 20 procent szans że klient wybrał źle kolejkę
     def check_choice_of_case(self):
         probMistake = 0.2
         randNumber = random.uniform(0, 1)
 
         if self.currentClient:
-            # klient źle wybrał
+
             if randNumber <= probMistake:
-                
                 self.changeClient()
                 return True
-            # klient dobrze wybrał
+            
             else:
                 serviceTime = self.currentClient.generate_service_time()
                 self.timeLeft = serviceTime
@@ -129,9 +117,11 @@ class Queue:
 
     def checkStatusEmployeesGeneral(self):
         for emp in range(len(self.employees)):
+            
             if self.employees[emp].status == 'free' and self.length != 0 and self.employees[emp].statusChangingClient != True:
                 self.employees[emp].change_status()
                 self.employees[emp].currentClient = self.dequeue()
+                
                 if self.employees[emp].check_choice_of_case():
                     toRedirect = self.employees[emp].currentClient
                     self.employees[emp].currentClient = None
@@ -140,11 +130,13 @@ class Queue:
                     toRedirect.redirected = True
                     print(toRedirect.redirected)
                     return toRedirect
+                
                 else:
                     return False
                 
     def checkStatusEmployeesTough(self):
         for emp in range(len(self.employees)):
+            
             if self.employees[emp].status == 'free' and self.length != 0 and self.employees[emp].statusChangingClient != True:
                 self.employees[emp].change_status()
                 self.employees[emp].currentClient = self.dequeue()
@@ -172,9 +164,6 @@ class Queue:
                 current = current.next
             return ', '.join(listOfClients)
 
-
-# zakladam 4 specjalistów konta, 3 kredyty, 2 pozyczki i 2 kryzys
-# 20 procent szans że klient wybrał źle kolejkę
 
 class Simulation:
 
@@ -259,32 +248,17 @@ class Simulation:
                                 'service_time': employee.currentClient.serviceTime
                             }
                             self.clients_data.append(served_client_data)
-                            
-
                             employee.change_status()
-                            print(employee.status)
+                    
                             employee.currentClient = None
                             employee.statusChangingClient = True
                             employee.timeLeft = 15
                         elif employee.timeLeft == 0 and employee.currentClient == None:
                             employee.change_status()
             current += 1
-        print(self.clientsArrivals)
         print("Clients data:", self.clients_data)
 
 
 sim = Simulation('sunday')
 sim.simulate(3)
 
-def add_data_to_file(file_name, clients_data):
-    try:
-        with open(file_name, 'a') as file:
-            file.write(f"{clients_data}")
-        print("Data has been successfully added to the file.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-plik = 'model2.txt'
-
-add_data_to_file(plik, sim.clients_data)
